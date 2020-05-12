@@ -1,0 +1,58 @@
+# Globals
+[maxscale]
+threads=4
+
+# Servers
+[dbgc1]
+type=server
+address=172.17.0.6
+port=3306
+protocol=MySQLBackend
+
+[dbgc2]
+type=server
+address=172.17.0.7
+port=3306
+protocol=MySQLBackend
+
+[dbgc3]
+type=server
+address=172.17.0.8
+port=3306
+protocol=MySQLBackend
+
+# Monitoring for the servers
+[Galera-Monitor]
+type=monitor
+module=galeramon
+servers=dbgc1,dbgc2,dbgc3
+user=maxscaleuser
+password=maxscalepass
+monitor_interval=1000
+
+# Galera router service
+[Galera-Service]
+type=service
+router=readwritesplit
+servers=dbgc1,dbgc2,dbgc3
+user=maxscaleuser
+password=maxscalepass
+
+# MaxAdmin Service
+[MaxAdmin-Service]
+type=service
+router=cli
+
+# Galera cluster listener
+[Galera-Listener]
+type=listener
+service=Galera-Service
+protocol=MySQLClient
+port=3306
+
+# MaxAdmin listener
+[MaxAdmin-Listener]
+type=listener
+service=MaxAdmin-Service
+protocol=maxscaled
+socket=default
